@@ -40,7 +40,7 @@ const draw = regl({
     },
     c: ({ time: t }) => {
       const a = [-0.765, 0.153]
-      const b = [Math.sin(t), Math.cos(t)]
+      const b = [Math.sin(t / 5), Math.cos(t / 5)]
       return vec2.scaleAndAdd([], a, b, 2e-2)
     }
   },
