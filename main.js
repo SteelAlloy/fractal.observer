@@ -1,5 +1,14 @@
 /* global createREGL, mat2, vec2 */
 
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker
+      .register('/serviceWorker.js')
+      .then(res => console.log('service worker registered'))
+      .catch(err => console.log('service worker not registered', err))
+  })
+}
+
 const regl = createREGL()
 const draw = regl({
   frag: `
@@ -12,7 +21,7 @@ const draw = regl({
     float mandelbrot(vec2 z, vec2 c) {
       for(float i = 0.0; i < 1e3; i++) {
         float xx = z.x*z.x, yy = z.y*z.y, zz = xx + yy;
-        if(zz > 256.0) return i - log2(log2(zz)) + 4.0;
+        if(zz > 16.0) return i - log2(log2(zz)) + 4.0;
         z = vec2(xx - yy, z.x*z.y*2.0) + c;
       }
     }
