@@ -36,12 +36,15 @@ const draw = regl({
       }
     }
     
+    uniform mat2 inverseTransform;
+    uniform mat2 transform;
     uniform vec2 c;
     uniform float maxIteration;
     varying vec2 z;
     void main() {
-      float m = mandelbrot(z, c, maxIteration);
-      vec3 rgb = 0.5 + 0.5*cos(3.0 + 0.15*m + vec3(0.0, 0.6, 1.0));
+      float m = mandelbrot(z, transform * c, maxIteration);
+      float k = mandelbrot(z, z, maxIteration);
+      vec3 rgb = 0.5 + 0.5*cos(3.0 + 0.15*m + 0.05*k + vec3(0.0, 0.6, 1.0));
       gl_FragColor = vec4(rgb, 1.0);
     }
   `,
@@ -58,12 +61,21 @@ const draw = regl({
     transform: ({ viewportWidth: w, viewportHeight: h }) => {
       return mat2.fromScaling([], [w / h, 1])
     },
-    c: ({ time: t }) => {
-      // const a = [-0.765, 0.153]
-      const a = [(x - 0.5) * 2, (y - 0.5) * 2]
-      // const b = [Math.sin(t / 5), Math.cos(t / 5)]
-      const b = [0, 0]
+    inverseTransform: ({ viewportWidth: w, viewportHeight: h }) => {
+      const res = mat2.create()
+      mat2.invert(res, mat2.fromScaling([], [w / h, 1]))
+      return res
+    },
+    /* c: ({ time: t }) => {
+      const a = [-0.765, 0.153]
+      const b = [Math.sin(t / 5), Math.cos(t / 5)]
       return vec2.scaleAndAdd([], a, b, 2e-2)
+    }, */
+    c: () => {
+      // const a = [(x - 0.5) * 2, (y - 0.5) * 2]
+      // const b = [0, 0]
+      // return vec2.scaleAndAdd([], a, b, 2e-2)
+      return vec2.fromValues(x * 2 - 1, y * 2 - 1)
     },
     maxIteration: 1e3
   },
